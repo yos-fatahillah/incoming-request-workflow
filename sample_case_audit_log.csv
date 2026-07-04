@@ -1,0 +1,11 @@
+request_id,timestamp,request_type,urgency,confidence,engine,branch,override_applied,raw_text
+REQ-1001,2026-07-02T06:37:03,Complaint,High,High,offline-keyword-fallback,Complaint,0,I was charged twice for my subscription this month and it's the second time this has happened. This is really disappointing and I'd like a refund for the duplicate charge.
+REQ-1002,2026-07-02T06:37:03,General Enquiry,Low,Medium,offline-keyword-fallback,General Enquiry,0,"Hi, just wondering what your customer support hours are on weekends? Also, do you offer support in French?"
+REQ-1003,2026-07-02T06:37:03,Service Request,Medium,Medium,offline-keyword-fallback,Service Request,0,Can you please update the delivery address on my last order? I moved house last week and the package hasn't shipped yet.
+REQ-1004,2026-07-02T06:37:03,Escalation,Critical,High,offline-keyword-fallback,Escalation,0,This is the THIRD time I'm contacting you about the same billing error and nobody has fixed it. I want to speak to a manager immediately or I will be taking this to my bank and reporting you to the regulator.
+REQ-1005,2026-07-02T06:37:03,Service Request,Medium,Medium,offline-keyword-fallback,Service Request,0,I'd like to upgrade my current plan to the Pro tier starting next billing cycle please.
+REQ-1006,2026-07-02T06:37:03,General Enquiry,Low,Medium,offline-keyword-fallback,General Enquiry,0,"Do you have a mobile app, and is it available on both iOS and Android?"
+REQ-1007,2026-07-02T06:37:03,Complaint,High,Medium,offline-keyword-fallback,Complaint,0,The replacement part I received was the wrong model and now my order is delayed by another two weeks. Very poor service on this order.
+REQ-1008,2026-07-02T06:37:03,Escalation,Critical,High,offline-keyword-fallback,Escalation,0,"I am extremely upset. I've already emailed twice with no response, this is unacceptable, and if this isn't resolved today I'm cancelling my account immediately and posting about this on social media."
+REQ-1009,2026-07-02T06:37:03,Service Request,Medium,Medium,offline-keyword-fallback,Service Request,0,"Please reset my account password, I've been locked out since this morning."
+REQ-1010,2026-07-02T06:37:03,General Enquiry,Low,Low,offline-keyword-fallback,Escalation,1,hey. this. still not fixed. do something.

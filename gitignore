@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+data/case_log.db
+demo_transcript.txt
+.env
+.DS_Store

@@ -1,0 +1,240 @@
+>> No ANTHROPIC_API_KEY set — running with offline keyword-fallback engine.
+   (Set ANTHROPIC_API_KEY to see live Claude-powered classification & drafting.)
+
+==============================================================================
+[REQ-1001] "I was charged twice for my subscription this month and it's the second time this has happe..."
+------------------------------------------------------------------------------
+  Classification : Complaint  (urgency=High, confidence=High, engine=offline-keyword-fallback)
+  Sub-topic      : complaint
+  Key details    : I was charged twice for my subscription this month and it's the second time this has happened. This is really disappointing and I'd like a refund for the duplic
+  Branch executed: Complaint
+  Steps:
+    1. Acknowledge receipt -> done
+       Acknowledgement drafted and queued to send within 15 minutes.
+    2. Escalate to senior handler -> done
+       Case routed to Senior Complaints Handler queue.
+    3. Log case with priority flag -> done
+       Case REQ-1001 logged with priority=HIGH.
+    4. Set 2-hour follow-up reminder -> done
+       Follow-up reminder set for 2026-07-02 08:37.
+  Outputs:
+    - escalation_notification: Senior Complaints Handler notified via internal queue.
+    - draft_acknowledgement: Hi there,
+
+Thanks for reaching out. We've received your message ("I was charged twice for my subscription this month and it's the second time this has...
+    - case_log_entry: {'request_id': 'REQ-1001', 'priority': 'HIGH', 'follow_up_due': '2026-07-02T08:37'}
+
+==============================================================================
+[REQ-1002] "Hi, just wondering what your customer support hours are on weekends? Also, do you offer su..."
+------------------------------------------------------------------------------
+  Classification : General Enquiry  (urgency=Low, confidence=Medium, engine=offline-keyword-fallback)
+  Sub-topic      : general
+  Key details    : Hi, just wondering what your customer support hours are on weekends? Also, do you offer support in French?
+  Branch executed: General Enquiry
+  Steps:
+    1. Classify sub-topic -> done
+       Sub-topic identified: general.
+    2. Generate AI response from knowledge base -> done
+       Response generated from support knowledge base context.
+    3. Send response -> done
+       Response queued for immediate send.
+    4. Log as resolved -> done
+       Case REQ-1002 marked RESOLVED.
+  Outputs:
+    - auto_generated_response: Hi there,
+
+Thanks for reaching out. We've received your message ("Hi, just wondering what your customer support hours are on weekends? Also, do you of...
+    - resolved_status_log: {'request_id': 'REQ-1002', 'status': 'RESOLVED'}
+
+==============================================================================
+[REQ-1003] "Can you please update the delivery address on my last order? I moved house last week and t..."
+------------------------------------------------------------------------------
+  Classification : Service Request  (urgency=Medium, confidence=Medium, engine=offline-keyword-fallback)
+  Sub-topic      : service request
+  Key details    : Can you please update the delivery address on my last order? I moved house last week and the package hasn't shipped yet.
+  Branch executed: Service Request
+  Steps:
+    1. Extract required details -> done
+       Key details captured: Can you please update the delivery address on my last order? I moved house last week and the package hasn't shipped yet.
+    2. Route to relevant department -> done
+       Routed to Account Management Team.
+    3. Generate confirmation to requester -> done
+       Confirmation message drafted.
+    4. Set SLA timer -> done
+       SLA due by 2026-07-03 06:37 (24h).
+  Outputs:
+    - routing_notification: Routed to Account Management Team.
+    - confirmation_message: Hi there,
+
+Thanks for reaching out. We've received your message ("Can you please update the delivery address on my last order? I moved house last week...
+    - sla_flag: {'request_id': 'REQ-1003', 'department': 'Account Management Team', 'sla_due': '2026-07-03T06:37'}
+
+==============================================================================
+[REQ-1004] "This is the THIRD time I'm contacting you about the same billing error and nobody has fixe..."
+------------------------------------------------------------------------------
+  Classification : Escalation  (urgency=Critical, confidence=High, engine=offline-keyword-fallback)
+  Sub-topic      : escalation
+  Key details    : This is the THIRD time I'm contacting you about the same billing error and nobody has fixed it. I want to speak to a manager immediately or I will be taking thi
+  Branch executed: Escalation
+  Steps:
+    1. Immediately flag for human review -> done
+       Case flagged CRITICAL and pinned to human review queue.
+    2. Draft urgent acknowledgement -> done
+       Urgent acknowledgement drafted for supervisor review before sending.
+    3. Notify supervisor -> done
+       Supervisor notified via priority alert channel.
+    4. Pause auto-resolution -> done
+       Automated resolution paused; case held for human-in-the-loop action.
+  Outputs:
+    - supervisor_alert: Priority alert sent to on-duty supervisor.
+    - draft_acknowledgement: Hi there,
+
+Thanks for reaching out. We've received your message ("This is the THIRD time I'm contacting you about the same billing error and nobody ha...
+    - human_in_the_loop_flag: {'request_id': 'REQ-1004', 'status': 'HELD_FOR_HUMAN_REVIEW'}
+
+==============================================================================
+[REQ-1005] "I'd like to upgrade my current plan to the Pro tier starting next billing cycle please."
+------------------------------------------------------------------------------
+  Classification : Service Request  (urgency=Medium, confidence=Medium, engine=offline-keyword-fallback)
+  Sub-topic      : service request
+  Key details    : I'd like to upgrade my current plan to the Pro tier starting next billing cycle please.
+  Branch executed: Service Request
+  Steps:
+    1. Extract required details -> done
+       Key details captured: I'd like to upgrade my current plan to the Pro tier starting next billing cycle please.
+    2. Route to relevant department -> done
+       Routed to Account Management Team.
+    3. Generate confirmation to requester -> done
+       Confirmation message drafted.
+    4. Set SLA timer -> done
+       SLA due by 2026-07-03 06:37 (24h).
+  Outputs:
+    - routing_notification: Routed to Account Management Team.
+    - confirmation_message: Hi there,
+
+Thanks for reaching out. We've received your message ("I'd like to upgrade my current plan to the Pro tier starting next billing cycle plea...
+    - sla_flag: {'request_id': 'REQ-1005', 'department': 'Account Management Team', 'sla_due': '2026-07-03T06:37'}
+
+==============================================================================
+[REQ-1006] "Do you have a mobile app, and is it available on both iOS and Android?"
+------------------------------------------------------------------------------
+  Classification : General Enquiry  (urgency=Low, confidence=Medium, engine=offline-keyword-fallback)
+  Sub-topic      : general
+  Key details    : Do you have a mobile app, and is it available on both iOS and Android?
+  Branch executed: General Enquiry
+  Steps:
+    1. Classify sub-topic -> done
+       Sub-topic identified: general.
+    2. Generate AI response from knowledge base -> done
+       Response generated from support knowledge base context.
+    3. Send response -> done
+       Response queued for immediate send.
+    4. Log as resolved -> done
+       Case REQ-1006 marked RESOLVED.
+  Outputs:
+    - auto_generated_response: Hi there,
+
+Thanks for reaching out. We've received your message ("Do you have a mobile app, and is it available on both iOS and Android?") and wanted ...
+    - resolved_status_log: {'request_id': 'REQ-1006', 'status': 'RESOLVED'}
+
+==============================================================================
+[REQ-1007] "The replacement part I received was the wrong model and now my order is delayed by another..."
+------------------------------------------------------------------------------
+  Classification : Complaint  (urgency=High, confidence=Medium, engine=offline-keyword-fallback)
+  Sub-topic      : complaint
+  Key details    : The replacement part I received was the wrong model and now my order is delayed by another two weeks. Very poor service on this order.
+  Branch executed: Complaint
+  Steps:
+    1. Acknowledge receipt -> done
+       Acknowledgement drafted and queued to send within 15 minutes.
+    2. Escalate to senior handler -> done
+       Case routed to Senior Complaints Handler queue.
+    3. Log case with priority flag -> done
+       Case REQ-1007 logged with priority=HIGH.
+    4. Set 2-hour follow-up reminder -> done
+       Follow-up reminder set for 2026-07-02 08:37.
+  Outputs:
+    - escalation_notification: Senior Complaints Handler notified via internal queue.
+    - draft_acknowledgement: Hi there,
+
+Thanks for reaching out. We've received your message ("The replacement part I received was the wrong model and now my order is delayed by a...
+    - case_log_entry: {'request_id': 'REQ-1007', 'priority': 'HIGH', 'follow_up_due': '2026-07-02T08:37'}
+
+==============================================================================
+[REQ-1008] "I am extremely upset. I've already emailed twice with no response, this is unacceptable, a..."
+------------------------------------------------------------------------------
+  Classification : Escalation  (urgency=Critical, confidence=High, engine=offline-keyword-fallback)
+  Sub-topic      : escalation
+  Key details    : I am extremely upset. I've already emailed twice with no response, this is unacceptable, and if this isn't resolved today I'm cancelling my account immediately 
+  Branch executed: Escalation
+  Steps:
+    1. Immediately flag for human review -> done
+       Case flagged CRITICAL and pinned to human review queue.
+    2. Draft urgent acknowledgement -> done
+       Urgent acknowledgement drafted for supervisor review before sending.
+    3. Notify supervisor -> done
+       Supervisor notified via priority alert channel.
+    4. Pause auto-resolution -> done
+       Automated resolution paused; case held for human-in-the-loop action.
+  Outputs:
+    - supervisor_alert: Priority alert sent to on-duty supervisor.
+    - draft_acknowledgement: Hi there,
+
+Thanks for reaching out. We've received your message ("I am extremely upset. I've already emailed twice with no response, this is unaccepta...
+    - human_in_the_loop_flag: {'request_id': 'REQ-1008', 'status': 'HELD_FOR_HUMAN_REVIEW'}
+
+==============================================================================
+[REQ-1009] "Please reset my account password, I've been locked out since this morning."
+------------------------------------------------------------------------------
+  Classification : Service Request  (urgency=Medium, confidence=Medium, engine=offline-keyword-fallback)
+  Sub-topic      : service request
+  Key details    : Please reset my account password, I've been locked out since this morning.
+  Branch executed: Service Request
+  Steps:
+    1. Extract required details -> done
+       Key details captured: Please reset my account password, I've been locked out since this morning.
+    2. Route to relevant department -> done
+       Routed to Technical Support Team.
+    3. Generate confirmation to requester -> done
+       Confirmation message drafted.
+    4. Set SLA timer -> done
+       SLA due by 2026-07-03 06:37 (24h).
+  Outputs:
+    - routing_notification: Routed to Technical Support Team.
+    - confirmation_message: Hi there,
+
+Thanks for reaching out. We've received your message ("Please reset my account password, I've been locked out since this morning.") and wan...
+    - sla_flag: {'request_id': 'REQ-1009', 'department': 'Technical Support Team', 'sla_due': '2026-07-03T06:37'}
+
+==============================================================================
+[REQ-1010] "hey. this. still not fixed. do something."
+------------------------------------------------------------------------------
+  Classification : General Enquiry  (urgency=Low, confidence=Low, engine=offline-keyword-fallback)
+  Sub-topic      : general
+  Key details    : hey. this. still not fixed. do something.
+  >>> ESCALATION OVERRIDE APPLIED: Low classification confidence on predicted type 'General Enquiry' -> auto-escalated to human review as a safety net.
+  Branch executed: Escalation
+  Steps:
+    1. Immediately flag for human review -> done
+       Case flagged CRITICAL and pinned to human review queue.
+    2. Draft urgent acknowledgement -> done
+       Urgent acknowledgement drafted for supervisor review before sending.
+    3. Notify supervisor -> done
+       Supervisor notified via priority alert channel.
+    4. Pause auto-resolution -> done
+       Automated resolution paused; case held for human-in-the-loop action.
+  Outputs:
+    - supervisor_alert: Priority alert sent to on-duty supervisor.
+    - draft_acknowledgement: Hi there,
+
+Thanks for reaching out. We've received your message ("hey. this. still not fixed. do something.") and wanted to confirm we're on it. We'll...
+    - human_in_the_loop_flag: {'request_id': 'REQ-1010', 'status': 'HELD_FOR_HUMAN_REVIEW'}
+
+==============================================================================
+SUMMARY DASHBOARD
+------------------------------------------------------------------------------
+  Total requests processed : 10
+  By type    : {'Complaint': 2, 'General Enquiry': 3, 'Service Request': 3, 'Escalation': 2}
+  By urgency : {'High': 2, 'Low': 3, 'Medium': 3, 'Critical': 2}
+  Overrides  : {'overridden': 1, 'normal': 9}
+==============================================================================
