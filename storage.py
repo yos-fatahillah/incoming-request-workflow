@@ -220,13 +220,14 @@ def find_stakeholder(position_contains: str, db_path: Path = DB_PATH):
 
 def summary_counts(db_path: Path = DB_PATH):
     cases = fetch_all_cases(db_path)
-    by_type, by_urgency, by_status = {}, {}, {}
+    by_type, by_urgency, by_status, by_branch = {}, {}, {}, {}
     by_override = {"overridden": 0, "normal": 0}
     human_needed = 0
     for c in cases:
         by_type[c["request_type"]] = by_type.get(c["request_type"], 0) + 1
         by_urgency[c["urgency"]] = by_urgency.get(c["urgency"], 0) + 1
         by_status[c["status"]] = by_status.get(c["status"], 0) + 1
+        by_branch[c["branch"]] = by_branch.get(c["branch"], 0) + 1
         if c["override_applied"]:
             by_override["overridden"] += 1
         else:
@@ -237,6 +238,6 @@ def summary_counts(db_path: Path = DB_PATH):
     deflection_pct = round(100 * (total - human_needed) / total) if total else 0
     return {
         "by_type": by_type, "by_urgency": by_urgency, "by_status": by_status,
-        "by_override": by_override, "total": total,
+        "by_branch": by_branch, "by_override": by_override, "total": total,
         "human_needed": human_needed, "deflection_pct": deflection_pct,
     }

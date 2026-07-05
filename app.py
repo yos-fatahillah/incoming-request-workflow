@@ -21,6 +21,7 @@ outbox respectively, so it is always demoable.
 import os
 import uuid
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -44,8 +45,8 @@ def new_request_id():
 
 def render_case_trace(request_id: str, text: str, classification: dict, result: dict):
     badge_color = {
-        "Low": "🟢", "Medium": "🟡", "High": "🟠", "Critical": "🔴",
-    }.get(classification.get("urgency"), "⚪")
+        "Low": "", "Medium": "", "High": "", "Critical": "",
+    }.get(classification.get("urgency"), "")
 
     st.markdown(f"### Case `{request_id}` — {badge_color} {classification.get('urgency')} urgency")
 
@@ -62,7 +63,7 @@ def render_case_trace(request_id: str, text: str, classification: dict, result: 
 
     st.markdown(f"#### Branch executed: `{result['branch']}`")
     for i, step in enumerate(result["steps"], 1):
-        st.markdown(f"**{i}. {step['step']}** — ✅ {step['status']}  \n*{step['detail']}*")
+        st.markdown(f"**{i}. {step['step']}** —  {step['status']}  \n*{step['detail']}*")
 
     st.markdown("#### Generated Outputs")
     for k, v in result["outputs"].items():
@@ -86,8 +87,24 @@ STATUS_BADGE = {
     "RESOLVED": "🟢 RESOLVED",
     "IN_PROGRESS": "🟡 IN PROGRESS",
     "HELD_FOR_REVIEW": "🔴 HELD FOR REVIEW",
-    "APPROVED": "✅ APPROVED",
+    "APPROVED": " APPROVED",
 }
+
+
+def labeled_bar_chart(data: dict, order: list = None):
+    """Bar chart with a value label above each bar (st.bar_chart can't do labels)."""
+    keys = [k for k in (order or list(data.keys())) if k in data]
+    df = pd.DataFrame({"category": keys, "count": [data[k] for k in keys]})
+    base = alt.Chart(df).encode(
+        x=alt.X("category:N", sort=keys, title=None,
+                axis=alt.Axis(labelAngle=0, labelLimit=120)),
+        y=alt.Y("count:Q", title=None,
+                scale=alt.Scale(domainMax=max(df["count"].max() * 1.25, 1))),
+    )
+    bars = base.mark_bar(color="#7cb9f0", cornerRadiusTopLeft=3, cornerRadiusTopRight=3)
+    labels = base.mark_text(dy=-10, fontSize=14, fontWeight="bold", color="#e5eefb").encode(
+        text=alt.Text("count:Q", format=".0f"))
+    st.altair_chart((bars + labels).properties(width="container", height=260))
 
 # ---------------------------------------------------------------------------
 # Sidebar
@@ -110,8 +127,8 @@ with st.sidebar:
     st.caption("Low-confidence classifications are held for human review (Review Queue tab).")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📥 Process a Request", "📦 Batch Processing", "🧑‍⚖️ Review Queue",
-    "📊 Dashboard & Audit Log", "🛠️ Admin",
+    "Process a Request", "Batch Processing", "Review Queue",
+    "Dashboard & Audit Log", "Admin",
 ])
 
 # ---------------------------------------------------------------------------
@@ -182,7 +199,7 @@ with tab3:
                     st.warning(case["override_reason"])
                 col_a, col_b, col_c = st.columns([1, 1.6, 1])
                 with col_a:
-                    if st.button("✅ Approve handling", key=f"approve_{case['request_id']}"):
+                    if st.button(" Approve handling", key=f"approve_{case['request_id']}"):
                         update_case_status(case["request_id"], "APPROVED")
                         st.success(f"{case['request_id']} approved.")
                         st.rerun()
@@ -226,16 +243,61 @@ with tab4:
         col_a, col_b, col_c = st.columns(3)
         with col_a:
             st.markdown("**Volume by Request Type**")
-            st.bar_chart(pd.Series(summary["by_type"], name="count"))
+            labeled_bar_chart(summary["by_type"])
         with col_b:
             st.markdown("**Volume by Urgency**")
-            urgency_order = ["Low", "Medium", "High", "Critical"]
-            st.bar_chart(pd.Series(
-                {k: summary["by_urgency"].get(k, 0) for k in urgency_order if k in summary["by_urgency"]},
-                name="count"))
+            labeled_bar_chart(summary["by_urgency"], order=["Low", "Medium", "High", "Critical"])
         with col_c:
             st.markdown("**Cases by Status**")
-            st.bar_chart(pd.Series(summary["by_status"], name="count"))
+            labeled_bar_chart(summary["by_status"],
+                              order=["RESOLVED", "IN_PROGRESS", "HELD_FOR_REVIEW", "APPROVED"])
+
+        # ------------------------------------------------------------------
+        # Estimated time & cost saved (branch-weighted, editable assumptions)
+        # ------------------------------------------------------------------
+        st.divider()
+        st.markdown("### Estimated Agent Time & Cost Saved")
+        st.caption(
+            "Logic: manually triaging a request means reading it, classifying it, routing it, "
+            "and drafting a reply. The workflow automates a different share of that work per "
+            "branch, so savings are weighted by branch, not flat. Estimates only — every "
+            "assumption below is editable."
+        )
+        with st.expander("Assumptions (editable)"):
+            a1, a2, a3, a4, a5 = st.columns(5)
+            min_enquiry = a1.number_input("General Enquiry (min saved)", 0.0, 60.0, 8.0, 0.5,
+                                          help="Fully automated: triage + drafted answer + auto-close.")
+            min_service = a2.number_input("Service Request (min saved)", 0.0, 60.0, 5.0, 0.5,
+                                          help="Triage, routing, and confirmation automated; the requested task itself still needs a human.")
+            min_complaint = a3.number_input("Complaint (min saved)", 0.0, 60.0, 4.0, 0.5,
+                                            help="Triage and acknowledgement automated; resolution stays human.")
+            min_escalation = a4.number_input("Escalation (min saved)", 0.0, 60.0, 2.0, 0.5,
+                                             help="Deliberately minimal: only triage is automated because human review is the point of this branch.")
+            hourly_rate = a5.number_input("Loaded agent cost ($/hr)", 0.0, 500.0, 30.0, 1.0,
+                                          help="Fully loaded hourly cost of a customer service agent.")
+
+        per_branch_min = {
+            "General Enquiry": min_enquiry,
+            "Service Request": min_service,
+            "Complaint": min_complaint,
+            "Escalation": min_escalation,
+        }
+        minutes_saved = sum(summary["by_branch"].get(b, 0) * m for b, m in per_branch_min.items())
+        cost_saved = minutes_saved / 60 * hourly_rate
+        avg_per_case = minutes_saved / summary["total"] if summary["total"] else 0
+
+        r1, r2, r3 = st.columns(3)
+        hours, mins = divmod(int(round(minutes_saved)), 60)
+        r1.metric("Est. agent time saved", f"{hours}h {mins}m",
+                  help="Sum over all processed cases of the per-branch minutes above.")
+        r2.metric("Est. cost saved", f"${cost_saved:,.2f}",
+                  help="Time saved x loaded hourly agent cost.")
+        r3.metric("Avg. saved per request", f"{avg_per_case:.1f} min")
+        breakdown = "  •  ".join(
+            f"{b}: {summary['by_branch'].get(b, 0)} x {m:g} min"
+            for b, m in per_branch_min.items() if summary["by_branch"].get(b, 0)
+        )
+        st.caption(f"Calculation: {breakdown}")
 
         st.divider()
         st.markdown("### Full Audit Trail / Case Log")
