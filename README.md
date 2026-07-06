@@ -4,36 +4,90 @@ An AI-powered prototype that classifies incoming customer requests and executes 
 distinct, multi-step remediation workflow for each classification — built for a
 general BPO / customer operations context.
 
-## 1. Setup
+## 1. Setup & Usage Tutorial
+
+### Step 1 — Install
 
 ```bash
 pip install -r requirements.txt
-
-# Optional — enables live Claude-powered classification & drafting.
-# Without this the app runs on a deterministic offline fallback so it's
-# always demoable, e.g. in an environment with no network access.
-export ANTHROPIC_API_KEY=sk-ant-...
-
-streamlit run app.py
+# On macOS, if pip isn't found: python3 -m pip install -r requirements.txt
 ```
 
-The app opens five tabs: **Process a Request** (simulated inbox / manual text /
-file upload), **Batch Processing** (runs the full sample dataset in one click),
-**Review Queue** (human-in-the-loop: approve or reclassify held cases),
-**Dashboard & Audit Log** (volumes, deflection rate, estimated time and cost
-saved, full case log with status filter and CSV export), and **Admin**
-(editable stakeholder directory that controls notification routing, plus a
-notification outbox).
+### Step 2 — Connect the Claude API (recommended)
 
-Optional: set `SMTP_USER` and `SMTP_PASSWORD` (a Gmail App Password) to send
-stakeholder notifications as real emails. Without them, notifications are
-logged to a simulated outbox instead, so the workflow always completes.
+The prototype works without any keys (it falls back to a deterministic offline
+classifier), but live Claude classification and drafting is the full experience.
 
-For a quick terminal-only smoke test (no UI):
+1. Create a key at [console.anthropic.com](https://console.anthropic.com) →
+   API Keys → Create Key (requires a small credit balance under Billing).
+2. In your terminal:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-...your-key..."
+```
+
+### Step 3 — Connect email notifications via Gmail SMTP (optional)
+
+With SMTP configured, stakeholder alerts (supervisor, senior handler,
+department owners) are sent as real emails. Without it, they are logged to a
+simulated Outbox in the Admin tab instead — the workflow completes either way.
+
+1. Enable **2-Step Verification** on your Google account
+   (myaccount.google.com → Security).
+2. Go to [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords),
+   create an App Password, and copy the 16-character code. Note: this is a
+   machine-only credential — your normal Gmail password will not work here
+   and should never be used in config.
+3. In your terminal:
+
+```bash
+export SMTP_USER="you@gmail.com"
+export SMTP_PASSWORD="your16charapppassword"
+```
+
+Environment variables reset when you close the terminal, so re-export all
+three in each new session (or keep them in a private file outside the repo
+and `source` it).
+
+### Step 4 — Launch
+
+```bash
+streamlit run app.py
+# On macOS, if streamlit isn't found: python3 -m streamlit run app.py
+```
+
+The browser opens at `http://localhost:8501`. The sidebar shows which mode is
+active: green badges for live Claude and live SMTP, blue for the fallbacks.
+
+### Step 5 — Use it, end to end
+
+1. **Admin tab** — set who gets notified. Edit the stakeholder directory
+   (name, position, email) and click Save. Positions are matched by keyword:
+   "Supervisor", "Senior Handler", "Department Owner - Billing", etc.
+2. **Process a Request tab** — pick a sample from the simulated inbox, paste
+   your own text, or upload a `.txt` file, then click Process. You'll see the
+   classification (type, urgency, confidence), the branch that ran, each
+   remediation step, and the generated outputs (draft reply, notifications,
+   flags).
+3. **Batch Processing tab** — one click processes the full 10-message sample
+   set, exercising every branch.
+4. **Review Queue tab** — escalations and low-confidence cases are held here.
+   Approve the AI's handling, or reclassify the case and re-run it down a
+   different branch.
+5. **Dashboard & Audit Log tab** — volumes by type/urgency/status, the
+   deflection rate, estimated time and cost saved (all assumptions editable),
+   and the full audit trail with a status filter and CSV export.
+6. **Admin tab → Outbox** — every notification sent, marked `sent` (real
+   email) or `simulated` (fallback).
+
+For a terminal-only smoke test with no UI:
 
 ```bash
 python3 run_batch_demo.py
 ```
+
+Tip: to reset the demo data completely, stop the app and delete
+`data/case_log.db` — it is recreated fresh on the next launch.
 
 ## 2. Workflow Design
 
