@@ -1,19 +1,32 @@
-# Incoming Request Processing Workflow — Prototype
+# Incoming Request Processing Workflow - Prototype
 
 An AI-powered prototype that classifies incoming customer requests and executes a
-distinct, multi-step remediation workflow for each classification — built for a
+distinct, multi-step remediation workflow for each classification - built for a
 general BPO / customer operations context.
+
+## 0. Which Document Should You Read?
+
+This submission includes four documents. Each answers a different question:
+
+| Document | Answers | Read this if you are... |
+|---|---|---|
+| **README** (this file) | How do I install it and click through it? | ...about to run the prototype yourself. |
+| **Product Document** | Why does this exist, and who is it for? | ...evaluating the business case, ethics, or market fit, without needing the code. |
+| **PRD** | What exactly must it do, and how does the logic work? | ...checking the build against requirements, or want the classification/decision-tree reasoning in full. |
+| **Maintenance Document** | How do I run, extend, or fix this after handover? | ...a developer inheriting the codebase, or debugging an issue (see its Troubleshooting table). |
+
+If you only have time for one document beyond this README, the **PRD** carries the most technical substance; the **Product Document** carries the most business framing.
 
 ## 1. Setup & Usage Tutorial
 
-### Step 1 — Install
+### Step 1 - Install
 
 ```bash
 pip install -r requirements.txt
 # On macOS, if pip isn't found: python3 -m pip install -r requirements.txt
 ```
 
-### Step 2 — Connect the Claude API (recommended)
+### Step 2 - Connect the Claude API (recommended)
 
 The prototype works without any keys (it falls back to a deterministic offline
 classifier), but live Claude classification and drafting is the full experience.
@@ -26,17 +39,17 @@ classifier), but live Claude classification and drafting is the full experience.
 export ANTHROPIC_API_KEY="sk-ant-...your-key..."
 ```
 
-### Step 3 — Connect email notifications via Gmail SMTP (optional)
+### Step 3 - Connect email notifications via Gmail SMTP (optional)
 
 With SMTP configured, stakeholder alerts (supervisor, senior handler,
 department owners) are sent as real emails. Without it, they are logged to a
-simulated Outbox in the Admin tab instead — the workflow completes either way.
+simulated Outbox in the Admin tab instead - the workflow completes either way.
 
 1. Enable **2-Step Verification** on your Google account
    (myaccount.google.com → Security).
 2. Go to [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords),
    create an App Password, and copy the 16-character code. Note: this is a
-   machine-only credential — your normal Gmail password will not work here
+   machine-only credential - your normal Gmail password will not work here
    and should never be used in config.
 3. In your terminal:
 
@@ -49,7 +62,7 @@ Environment variables reset when you close the terminal, so re-export all
 three in each new session (or keep them in a private file outside the repo
 and `source` it).
 
-### Step 4 — Launch
+### Step 4 - Launch
 
 ```bash
 streamlit run app.py
@@ -59,25 +72,25 @@ streamlit run app.py
 The browser opens at `http://localhost:8501`. The sidebar shows which mode is
 active: green badges for live Claude and live SMTP, blue for the fallbacks.
 
-### Step 5 — Use it, end to end
+### Step 5 - Use it, end to end
 
-1. **Admin tab** — set who gets notified. Edit the stakeholder directory
+1. **Admin tab** - set who gets notified. Edit the stakeholder directory
    (name, position, email) and click Save. Positions are matched by keyword:
    "Supervisor", "Senior Handler", "Department Owner - Billing", etc.
-2. **Process a Request tab** — pick a sample from the simulated inbox, paste
+2. **Process a Request tab** - pick a sample from the simulated inbox, paste
    your own text, or upload a `.txt` file, then click Process. You'll see the
    classification (type, urgency, confidence), the branch that ran, each
    remediation step, and the generated outputs (draft reply, notifications,
    flags).
-3. **Batch Processing tab** — one click processes the full 10-message sample
+3. **Batch Processing tab** - one click processes the full 10-message sample
    set, exercising every branch.
-4. **Review Queue tab** — escalations and low-confidence cases are held here.
+4. **Review Queue tab** - escalations and low-confidence cases are held here.
    Approve the AI's handling, or reclassify the case and re-run it down a
    different branch.
-5. **Dashboard & Audit Log tab** — volumes by type/urgency/status, the
+5. **Dashboard & Audit Log tab** - volumes by type/urgency/status, the
    deflection rate, estimated time and cost saved (all assumptions editable),
    and the full audit trail with a status filter and CSV export.
-6. **Admin tab → Outbox** — every notification sent, marked `sent` (real
+6. **Admin tab → Outbox** - every notification sent, marked `sent` (real
    email) or `simulated` (fallback).
 
 For a terminal-only smoke test with no UI:
@@ -87,7 +100,7 @@ python3 run_batch_demo.py
 ```
 
 Tip: to reset the demo data completely, stop the app and delete
-`data/case_log.db` — it is recreated fresh on the next launch.
+`data/case_log.db` - it is recreated fresh on the next launch.
 
 ## 2. Workflow Design
 
@@ -125,7 +138,7 @@ for strict JSON output: `request_type`, `urgency`, `sub_topic`, `confidence`,
 
 **Why a `confidence` field matters:** rather than forcing every request into one
 of four buckets even when the model is unsure, the classifier also self-reports
-its confidence. `workflows.run_workflow()` checks this before branching — any
+its confidence. `workflows.run_workflow()` checks this before branching - any
 `confidence == "Low"` result is force-routed to the **Escalation** branch
 regardless of the predicted type, holding the case for human review instead of
 letting a shaky auto-classification drive an unsupervised action. This is the
@@ -137,7 +150,7 @@ any reason), `classifier.py` transparently falls back to a keyword/regex-based
 classifier so the prototype never goes down and stays demoable in constrained
 environments. The `engine` field on every classification result records which
 path was used (`claude-api:<model>` vs `offline-keyword-fallback`), and this is
-visible in both the UI and the audit log — nothing is hidden from the ops team.
+visible in both the UI and the audit log - nothing is hidden from the ops team.
 
 ## 4. Remediation Strategy per Branch
 
@@ -155,18 +168,18 @@ set without a live model.
 
 ## 5. Tools Used
 
-- **Python 3** — orchestration logic (`classifier.py`, `workflows.py`, `storage.py`)
-- **Anthropic Claude API** (`claude-sonnet-4-5`) — classification + draft generation
-- **Streamlit** — 5-tab UI (intake, batch, review queue, dashboard, admin)
-- **smtplib (Gmail SMTP)** — optional real email notifications to stakeholders, with a simulated-outbox fallback
-- **SQLite** — case log / audit trail (`data/case_log.db`)
-- **Pandas** — dashboard aggregation, CSV export
+- **Python 3** - orchestration logic (`classifier.py`, `workflows.py`, `storage.py`)
+- **Anthropic Claude API** (`claude-sonnet-4-5`) - classification + draft generation
+- **Streamlit** - 5-tab UI (intake, batch, review queue, dashboard, admin)
+- **smtplib (Gmail SMTP)** - optional real email notifications to stakeholders, with a simulated-outbox fallback
+- **SQLite** - case log / audit trail (`data/case_log.db`)
+- **Pandas** - dashboard aggregation, CSV export
 
 ## 6. One End-to-End Example per Branch
 
 *Sub-topic labels below reflect live Claude API output. The offline fallback
 engine (used when `ANTHROPIC_API_KEY` is unset) produces coarser generic labels
-(e.g. `"complaint"`, `"general"`) — branching and remediation steps are
+(e.g. `"complaint"`, `"general"`) - branching and remediation steps are
 identical either way; only the richness of the extracted metadata differs.*
 
 ### Complaint → `REQ-1001`
@@ -210,7 +223,7 @@ identical either way; only the richness of the extracted metadata differs.*
   auto-resolution paused
 - Outputs: supervisor alert, draft acknowledgement, human-in-the-loop flag
 
-### Bonus — Safety-net override → `REQ-1010`
+### Bonus - Safety-net override → `REQ-1010`
 > *"hey. this. still not fixed. do something."*
 
 - Predicted type: General Enquiry, but classifier `confidence = Low` (too short
@@ -221,16 +234,16 @@ identical either way; only the richness of the extracted metadata differs.*
 
 ## 7. Design Decisions & Trade-offs
 
-- **Confidence-gated override over a fixed keyword blocklist** — a threshold on
+- **Confidence-gated override over a fixed keyword blocklist** - a threshold on
   the model's own reported confidence generalizes better than trying to
   enumerate every ambiguous phrasing by hand.
-- **SQLite over a flat file** — trivial to query for the dashboard, upgradeable
+- **SQLite over a flat file** - trivial to query for the dashboard, upgradeable
   to Postgres with a one-line connection-string change if this moved to
   production.
-- **Draft-then-hold for Escalation** — the acknowledgement is generated but
+- **Draft-then-hold for Escalation** - the acknowledgement is generated but
   explicitly not marked as sent, since critical cases should always pass
   through a human before anything goes out to the customer.
-- **Offline fallback as a first-class path, not an afterthought** — a real ops
+- **Offline fallback as a first-class path, not an afterthought** - a real ops
   team cannot have their whole triage pipeline go down when a third-party API
   has a bad minute; this prototype models that resilience directly.
 
