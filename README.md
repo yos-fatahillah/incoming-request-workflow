@@ -17,10 +17,17 @@ export ANTHROPIC_API_KEY=sk-ant-...
 streamlit run app.py
 ```
 
-The app opens three tabs: **Process a Request** (simulated inbox / manual text /
+The app opens five tabs: **Process a Request** (simulated inbox / manual text /
 file upload), **Batch Processing** (runs the full sample dataset in one click),
-and **Dashboard & Audit Log** (volumes by type/urgency + full case log with CSV
-export).
+**Review Queue** (human-in-the-loop: approve or reclassify held cases),
+**Dashboard & Audit Log** (volumes, deflection rate, estimated time and cost
+saved, full case log with status filter and CSV export), and **Admin**
+(editable stakeholder directory that controls notification routing, plus a
+notification outbox).
+
+Optional: set `SMTP_USER` and `SMTP_PASSWORD` (a Gmail App Password) to send
+stakeholder notifications as real emails. Without them, notifications are
+logged to a simulated outbox instead, so the workflow always completes.
 
 For a quick terminal-only smoke test (no UI):
 
@@ -96,7 +103,8 @@ set without a live model.
 
 - **Python 3** — orchestration logic (`classifier.py`, `workflows.py`, `storage.py`)
 - **Anthropic Claude API** (`claude-sonnet-4-5`) — classification + draft generation
-- **Streamlit** — UI (intake, batch run, dashboard)
+- **Streamlit** — 5-tab UI (intake, batch, review queue, dashboard, admin)
+- **smtplib (Gmail SMTP)** — optional real email notifications to stakeholders, with a simulated-outbox fallback
 - **SQLite** — case log / audit trail (`data/case_log.db`)
 - **Pandas** — dashboard aggregation, CSV export
 
@@ -172,22 +180,40 @@ identical either way; only the richness of the extracted metadata differs.*
   team cannot have their whole triage pipeline go down when a third-party API
   has a bad minute; this prototype models that resilience directly.
 
-## 8. Potential Enhancements (given more time)
+## 8. Known Gaps & v2 Priorities
 
-- Fine-tune department routing with a small classifier instead of keyword
-  matching, or let Claude pick the department directly.
-- Add a human-override UI (approve/reject/reclassify buttons) directly in the
-  case trace view, not just in the audit log.
-- Multi-turn threading — link follow-up messages from the same customer to an
-  existing case instead of treating each message as a new request.
-- Real email/Slack integration for the routing notifications and supervisor
-  alerts (currently simulated as structured log entries).
+Honest limitations of the current build, roughly in the order we would tackle
+them next:
+
+- **No accuracy evaluation.** The 10-message sample set demonstrates the
+  pipeline but does not measure it. A serious v2 needs a labelled test set
+  (~100 messages) with per-category accuracy and a confusion matrix, so
+  classification quality is a number rather than a claim.
+- **Urgency is displayed, not consumed.** A High-urgency service request gets
+  the same 24h SLA as a Medium one. Urgency should scale the SLA window, the
+  follow-up timer, and notification priority inside each branch.
+- **Keyword department routing.** Fast and fully explainable, but coarser than
+  letting the model choose the department directly (with keywords retained as
+  the fallback).
+- **No few-shot examples in the classifier prompt.** Category definitions only.
+  Adding 2-3 worked examples per category would tighten consistency on vague
+  messages, which currently skew (deliberately) toward cautious escalation.
+- **Multi-intent messages take one branch.** A message containing both a
+  complaint and an enquiry rides the complaint path; the enquiry half is not
+  split into its own case.
+- **Case threading.** Each message is a new case. Linking repeat contacts by a
+  customer identifier would enable auto-escalation on repeat contact.
+- **Feedback loop.** Human reclassifications are already logged with
+  `engine = human-reclassified`, but nothing learns from them yet. Using these
+  corrections to refine the prompt or few-shot set is the natural next step,
+  since the data collection is already built.
 
 ## Project Structure
 
 ```
 .
-├── app.py              # Streamlit UI (3 tabs: intake, batch, dashboard)
+├── app.py              # Streamlit UI (5 tabs incl. review queue & admin)
+├── notifier.py          # stakeholder email notifications + outbox fallback
 ├── classifier.py        # Claude-based classification + offline fallback
 ├── workflows.py         # Branch-specific remediation logic (4 branches)
 ├── storage.py            # SQLite audit trail / case log
